@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+<section class="vh-100">
+    <div class="container-fluid h-custom">
+      <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col-md-9 col-lg-6 col-xl-5">
+          <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp"
+            class="img-fluid" alt="Sample image">
+        </div>
+        <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+          <form>
+            <!-- <div class="d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
+              <p class="lead fw-normal mb-0 me-3">Sign in with</p>
+              <button type="button" class="btn btn-primary btn-floating mx-1">
+                <i class="fab fa-facebook-f"></i>
+              </button>
+  
+              <button type="button" class="btn btn-primary btn-floating mx-1">
+                <i class="fab fa-twitter"></i>
+              </button>
+  
+              <button type="button" class="btn btn-primary btn-floating mx-1">
+                <i class="fab fa-linkedin-in"></i>
+              </button>
+            </div>
+  
+            <div class="divider d-flex align-items-center my-4">
+              <p class="text-center fw-bold mx-3 mb-0">Or</p>
+            </div> -->
+  
+            <!-- Email input -->
+            {% if user.is_authenticated %}
+            Hi {{ user.username }}!
+            <a href="{% url 'logout' %}">Log Out</a>
+          
+          {% else %}
+            <p>You are not logged in</p>
+            <a href="{% url 'login' %}">Log In</a>
+          
+          {% endif %}
+<br>
+<br>
+          Status Interval
+       <div style="display: flex;padding-top: 20px;">
+          <div class="input-group input-group-sm mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="inputGroup-sizing-sm">Min</span>
+            </div>
+            <input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" id="min">
+          </div>
+           
+          <div class="input-group input-group-sm mb-3" style="padding-left: 20px;">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="inputGroup-sizing-sm">Max</span>
+            </div>
+            <input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" id="max">
+          </div>
+        </div>
+        <div class="form-group">
+            <label for="exampleFormControlTextarea1">pause statuses using their id seperated by ,(comma)</label>
+            <textarea class="form-control" id="textarea" rows="3"></textarea>
+          </div>
+          <br>
+          <button type="button" class="btn btn-primary btn-floating mx-1" onclick="monitor()">
+           Check
+          </button>
+  
+          </form>
+        </div>
+      </div>
+    </div>
+
+    {% if user.is_authenticated %}
+    
+    <div style="padding-left: 80px;padding-right: 80px;">
+    <table class="table" id="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">url</th>
+            <th scope="col">pause</th>
+            <th scope="col">status</th>
+          </tr>
+        </thead>
+        <tbody>
+   
+</tbody>
+</table>    
+</div>
+  {% endif %}
+    <div
+      class="d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-primary">
+      <!-- Copyright -->
+      <div class="text-white mb-3 mb-md-0">
+        Copyright © 2022. All rights reserved.
+      </div>
+      <!-- Copyright -->
+  
+      <!-- Right -->
+      <div>
+        <a href="#!" class="text-white me-4">
+          <i class="fab fa-facebook-f"></i>
+        </a>
+        <a href="#!" class="text-white me-4">
+          <i class="fab fa-twitter"></i>
+        </a>
+        <a href="#!" class="text-white me-4">
+          <i class="fab fa-google"></i>
+        </a>
+        <a href="#!" class="text-white">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </div>
+      <!-- Right -->
+    </div>
+  </section>
+
+<script>
+    var urls = JSON.parse('{{ urls | safe }}');
+
+    // alert(urls[0].fields.url);
+
+    function monitor(){
+      var min=parseInt(document.getElementById('min').value);
+      var max=parseInt(document.getElementById('max').value);
+      var text=document.getElementById('textarea').value.split(",");
+      if(isNaN(min))
+       min=0
+      if(isNaN(max))
+       max=999
+      var table = document.getElementById('table');
+      for(var x=0;x<text.length;x++)
+      console.log(text[x]);
+      console.log(text.includes("200"));
+
+      for(var x=0;x<urls.length;x++){
+
+        if(x+1<table.rows.length)
+          table.deleteRow(1);
+
+        var rowCount = table.rows.length;
+        var row = table.insertRow(rowCount);
+
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        var cell3 = row.insertCell(2);
+        var cell4 = row.insertCell(3);
+        cell1.innerHTML =x+1;
+        cell2.innerHTML =urls[x].fields.url;
+        cell3.innerHTML = 'True';
+        cell4.innerHTML = '-'
+        $.ajax({
+          type: 'GET',
+          headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'Access-Control-Allow-Origin':'*'
+          },
+          type: 'GET',
+          crossDomain: true,
+          async: false, 
+          url: urls[x].fields.url,
+          
+          success: function(d,status){
+            if(min<=200 && max>=200 && !text.includes("200")){
+              cell4.innerHTML = 200;
+              cell1.style.backgroundColor = "green";
+              cell2.style.backgroundColor = "green";
+              cell3.style.backgroundColor = "green";
+              cell4.style.backgroundColor = "green";
+            }
+          },
+          error: function(response) {
+            if(min<=response.status && max>=response.status && !text.includes(response.status.toString()))
+              cell4.innerHTML = response.status;
+              cell1.style.backgroundColor = "red";
+              cell2.style.backgroundColor = "red";
+              cell3.style.backgroundColor = "red";
+              cell4.style.backgroundColor = "red";
+          }, 
+        });
+          
+      }
+    }
+    monitor();
+   
+</script>
+
+
+{% endblock %}
