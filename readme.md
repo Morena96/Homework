@@ -12,3 +12,7 @@ install requirements.txt
 (.venv) % python manage.py runserver
 
 navigate to http://localhost:8000 you'll see the project welcome screen
+
+admin url: http://localhost:8000/admin
+user:       dovlet
+password:   homework
