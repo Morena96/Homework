@@ -1,3 +1,5 @@
+# Easily monitor urls
+
 create a new project directory for our code on the Desktop
 create a new virtual environment called .venv and activate it
 install requirements.txt
